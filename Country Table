@@ -1,0 +1,105 @@
+ ******** Create Table ********
+ 
+ CREATE TABLE [dbo].[Country](
+	[CountryID] [int] PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	[CountryName] [varchar](50) NULL,
+	[CountryAreaCode] [varchar](50) NULL,
+	[CountryCode] [varchar](50) NULL,
+	[CountryTelephoneCode] [varchar](50) NULL
+	)
+
+******** Create Stored Procedure ********
+
+Create PROCEDURE SP_Country
+
+@CountryID int,
+@CountryName varchar(50),	
+@CountryAreaCode varchar(50),	
+@CountryCode varchar(50),	 
+@CountryTelephoneCode varchar(50),
+@SPAction varchar(15)
+
+As
+Begin
+
+	If(@SPAction='I')
+		Begin
+			Insert Into Country(CountryName,CountryAreaCode,CountryCode,CountryTelephoneCode) 
+			values(@CountryName,@CountryAreaCode,@CountryCode,@CountryTelephoneCode)
+		End
+
+	Else If(@SPAction='U')
+		Begin
+	
+			Declare @_CountryName varchar(50),	
+			@_CountryAreaCode varchar(50),	
+			@_CountryCode varchar(50),	 
+			@_CountryTelephoneCode varchar(50);
+
+			Select 		
+			@_CountryAreaCode=CountryAreaCode,
+			@_CountryCode=CountryCode,
+			@_CountryTelephoneCode=CountryTelephoneCode 
+			From Country Where CountryID=@CountryID;
+
+			SET @_CountryAreaCode=ISNULL(@CountryAreaCode,'');
+			SET @_CountryCode=ISNULL(@CountryCode,'');
+			SET @_CountryTelephoneCode=ISNULL(@CountryTelephoneCode,'');
+		
+			Update Country Set CountryName=@CountryName,		
+			CountryAreaCode=@_CountryAreaCode,
+			CountryCode=@_CountryCode,
+			CountryTelephoneCode=@_CountryTelephoneCode
+			Where CountryID=@CountryID;
+
+		End	
+
+	Else If(@SPAction='S')
+		Begin
+			Select * From Country
+		End
+	
+
+End
+  
+******** Insert Records to Country table ********
+DECLARE	@return_value int
+EXEC	@return_value = [dbo].[SP_Country]
+		@CountryID = 1,
+		@CountryName = N'India',
+		@CountryAreaCode = N'IN',
+		@CountryCode = N'IN',
+		@CountryTelephoneCode = N'+91',
+		@SPAction = N'I'
+SELECT	'Return Value' = @return_value
+GO
+
+DECLARE	@return_value int
+EXEC	@return_value = [dbo].[SP_Country]
+		@CountryID = 1,
+		@CountryName = N'Bangladesh',
+		@CountryAreaCode = N'BD',
+		@CountryCode = N'BD',
+		@CountryTelephoneCode = N'+880',
+		@SPAction = N'I'
+SELECT	'Return Value' = @return_value
+GO
+
+******** Update Records to Country table ********
+EXEC [dbo].[SP_Country]
+		@CountryID = 1,
+		@CountryName = N'India',
+		@CountryAreaCode = N'IN',
+		@CountryCode = N'IN',
+		@CountryTelephoneCode = N'+92',
+		@SPAction = N'U'
+    
+    
+ EXEC [dbo].[SP_Country]
+		@CountryID = 0,
+		@CountryName = N'',
+		@CountryAreaCode = N'',
+		@CountryCode = N'',
+		@CountryTelephoneCode = N'',
+		@SPAction = N'S'
+

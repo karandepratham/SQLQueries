@@ -60,6 +60,11 @@ Begin
 		End
 	
 
+	Else If(@SPAction='D')
+		Begin
+			Delete From Country Where CountryID=@CountryID;
+		End
+		
 End
   
 ******** Insert Records to Country table ********
